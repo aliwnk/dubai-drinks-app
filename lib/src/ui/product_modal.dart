@@ -87,17 +87,27 @@ class _ProductDialogState extends State<_ProductDialog> {
                   if (p.options.isNotEmpty) ...[
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text("Выберите вариант:", style: TextStyle(fontWeight: FontWeight.w600)),
+                      child: Text("Выберите размер:", style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
-                    Column(
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: p.options.map((o) {
-                        return RadioListTile<int>(
-                          title: tengeText("${o.option.label}: ${o.price.toStringAsFixed(0)}", const TextStyle()),
-                          value: o.id,
-                          groupValue: _selectedOptionId,
-                          onChanged: (v) {
-                            setState(() => _selectedOptionId = v);
-                          },
+                        final bool selected = _selectedOptionId == o.id;
+                        final Color labelColor = selected ? Colors.white : Colors.black87;
+                        return ChoiceChip(
+                          selected: selected,
+                          selectedColor: const Color(0xFF057A4C),
+                          backgroundColor: const Color(0xFFF5F5F5),
+                          onSelected: (_) => setState(() => _selectedOptionId = o.id),
+                          label: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("${o.option.label} - ", style: TextStyle(color: labelColor)),
+                              tengeText(o.price.toStringAsFixed(0), TextStyle(color: labelColor)),
+                            ],
+                          ),
                         );
                       }).toList(),
                     ),
@@ -204,6 +214,10 @@ class _ProductDialogState extends State<_ProductDialog> {
                       ),
                       const Spacer(),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF057A4C),
+                          foregroundColor: Colors.white,
+                        ),
                         onPressed: () {
                           if (_selectedOptionId == null && p.options.isNotEmpty) {
                             ScaffoldMessenger.of(context)
@@ -224,6 +238,10 @@ class _ProductDialogState extends State<_ProductDialog> {
                       ),
                       const SizedBox(width: 8),
                       OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFEF3340),
+                          side: const BorderSide(color: Color(0xFFEF3340)),
+                        ),
                         onPressed: () => Navigator.of(context).pop(),
                         child: const Text("Закрыть"),
                       ),
@@ -322,14 +340,26 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
 
           // Опции (размеры)
           if (p.options.isNotEmpty) ...[
-            const Text("Выберите вариант:", style: TextStyle(fontWeight: FontWeight.w600)),
-            Column(
+            const Text("Выберите размер:", style: TextStyle(fontWeight: FontWeight.w600)),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: p.options.map((o) {
-                return RadioListTile<int>(
-                  title: tengeText("${o.option.label}: ${o.price.toStringAsFixed(0)}", const TextStyle()),
-                  value: o.id,
-                  groupValue: _selectedOptionId,
-                  onChanged: (v) => setState(() => _selectedOptionId = v),
+                final bool selected = _selectedOptionId == o.id;
+                final Color labelColor = selected ? Colors.white : Colors.black87;
+                return ChoiceChip(
+                  selected: selected,
+                  selectedColor: const Color(0xFF057A4C),
+                  backgroundColor: const Color(0xFFF5F5F5),
+                  onSelected: (_) => setState(() => _selectedOptionId = o.id),
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("${o.option.label} - ", style: TextStyle(color: labelColor)),
+                      tengeText(o.price.toStringAsFixed(0), TextStyle(color: labelColor)),
+                    ],
+                  ),
                 );
               }).toList(),
             ),
@@ -346,10 +376,20 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                 child: Row(
                   children: p.addons.map((a) {
                     final checked = _selectedAddons.contains(a.id);
-                    return Container(
-                      width: 100,
-                      margin: const EdgeInsets.only(right: 8),
-                      child: Column(
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          if (checked) {
+                            _selectedAddons.remove(a.id);
+                          } else {
+                            _selectedAddons.add(a.id);
+                          }
+                        });
+                      },
+                      child: Container(
+                        width: 100,
+                        margin: const EdgeInsets.only(right: 8),
+                        child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ClipRRect(
@@ -408,6 +448,7 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                             },
                           ),
                         ],
+                        ),
                       ),
                     );
                   }).toList(),
@@ -432,8 +473,8 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
               const Spacer(),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: scheme.primary,
-                  foregroundColor: scheme.onPrimary,
+                  backgroundColor: const Color(0xFF057A4C),
+                  foregroundColor: Colors.white,
                 ),
                 onPressed: () {
                   if (_selectedOptionId == null && p.options.isNotEmpty) {
@@ -459,7 +500,14 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                 child: const Text("Заказать"),
               ),
               const SizedBox(width: 8),
-              OutlinedButton(onPressed: widget.onClose, child: const Text("Закрыть")),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFEF3340),
+                  side: const BorderSide(color: Color(0xFFEF3340)),
+                ),
+                onPressed: widget.onClose,
+                child: const Text("Закрыть"),
+              ),
             ],
           ),
         ],

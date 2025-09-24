@@ -618,15 +618,25 @@ class _ProductCardState extends State<_ProductCard> with SingleTickerProviderSta
       PageRouteBuilder(
         opaque: false,
         barrierDismissible: true,
+        barrierColor: Colors.black.withValues(alpha: 0.1),
         pageBuilder: (context, animation, secondaryAnimation) {
           return _ModalPage(product: widget.product);
         },
         transitionDuration: const Duration(milliseconds: 400),
         reverseTransitionDuration: const Duration(milliseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                child: const SizedBox.shrink(),
+              ),
+              FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            ],
           );
         },
       ),
@@ -642,35 +652,34 @@ class _ModalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black.withValues(alpha: 0.1),
+      color: Colors.transparent,
       child: GestureDetector(
         onTap: () => Navigator.of(context).pop(),
         behavior: HitTestBehavior.opaque,
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Размытие заднего фона
-            BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-              child: const SizedBox.shrink(),
-            ),
             Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width - 240,
-            margin: const EdgeInsets.symmetric(vertical: 200),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(32),
-              boxShadow: const [],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: ProductModalEmbedded(
-                product: product,
-                onClose: () => Navigator.of(context).pop(),
+              child: GestureDetector(
+                onTap: () {},
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 240,
+                  margin: const EdgeInsets.symmetric(vertical: 200),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: const [],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: ProductModalEmbedded(
+                      product: product,
+                      onClose: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
             ),
           ],
         ),
@@ -734,15 +743,25 @@ class _CartBarState extends State<_CartBar> with SingleTickerProviderStateMixin 
       PageRouteBuilder(
         opaque: false,
         barrierDismissible: true,
+        barrierColor: Colors.black.withValues(alpha: 0.1),
         pageBuilder: (context, animation, secondaryAnimation) {
           return const _CartModalPage();
         },
         transitionDuration: const Duration(milliseconds: 400),
         reverseTransitionDuration: const Duration(milliseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                child: const SizedBox.shrink(),
+              ),
+              FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            ],
           );
         },
       ),
@@ -804,7 +823,7 @@ class _CartBarState extends State<_CartBar> with SingleTickerProviderStateMixin 
               return Transform.scale(
                 scale: _scaleAnimation.value,
         child: Material(
-                  color: const Color(0xFF00B050),
+                  color: const Color(0xFF057A4C),
           borderRadius: BorderRadius.circular(50),
           elevation: 8,
           child: Padding(
@@ -850,7 +869,7 @@ class _CartBarState extends State<_CartBar> with SingleTickerProviderStateMixin 
                                         child: const Center(
                                           child: Icon(
                                             Icons.shopping_bag_outlined,
-                                            color: Color(0xFF00B050),
+                                            color: Color(0xFF057A4C),
                                             size: 20,
                                           ),
                                         ),
@@ -919,13 +938,13 @@ class _CartBarState extends State<_CartBar> with SingleTickerProviderStateMixin 
                                               width: 18,
                                               height: 18,
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFF00B050),
+                                                color: Colors.white,
                                                 borderRadius: BorderRadius.circular(9),
                                               ),
                                               child: const Icon(
                                                 Icons.close,
                                                 size: 12,
-                                                color: Colors.white,
+                                                color: Color(0xFFEF3340),
                                               ),
                                   ),
                                 ),
@@ -951,7 +970,7 @@ class _CartBarState extends State<_CartBar> with SingleTickerProviderStateMixin 
                           opacity: _isSwipeActive ? 0.0 : 1.0,
                           child: IconButton(
                   onPressed: () => context.read<CartState>().clearAll(),
-                  icon: const Icon(Icons.delete_outline, color: Colors.white),
+                  icon: const Icon(Icons.delete_outline, color: Color(0xFFEF3340)),
                           ),
                 ),
               ],
@@ -977,9 +996,18 @@ class _CartBarState extends State<_CartBar> with SingleTickerProviderStateMixin 
       pageBuilder: (_, __, ___) => _EditProductDialog(item: item),
       transitionBuilder: (ctx, anim, _, child) {
         final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
-        return Transform.scale(
-          scale: 0.95 + 0.05 * curved.value,
-          child: Opacity(opacity: anim.value, child: child),
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+              child: const SizedBox.shrink(),
+            ),
+            Transform.scale(
+              scale: 0.95 + 0.05 * curved.value,
+              child: Opacity(opacity: anim.value, child: child),
+            ),
+          ],
         );
       },
     );
@@ -994,17 +1022,13 @@ class _CartModalPage extends StatelessWidget {
     final cart = context.watch<CartState>();
     final items = cart.items;
     return Material(
-      color: Colors.black.withValues(alpha: 0.1),
+      color: Colors.transparent,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => Navigator.of(context).pop(),
         child: Stack(
           fit: StackFit.expand,
           children: [
-            BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-              child: const SizedBox.shrink(),
-            ),
             Center(
               child: GestureDetector(
                 onTap: () {},
@@ -1187,7 +1211,7 @@ class _CartModalPage extends StatelessWidget {
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF00B050),
+                                  backgroundColor: const Color(0xFF057A4C),
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1224,10 +1248,17 @@ class _CartModalPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFEF3340),
+            ),
             child: const Text('Отмена'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(controller.text),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF057A4C),
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Продолжить'),
           ),
         ],
@@ -1270,6 +1301,20 @@ class _EditProductDialogState extends State<_EditProductDialog> {
   final Set<int> _selectedAddons = {};
   int _qty = 1;
 
+  String _formatPrice(num value) {
+    final s = value.toStringAsFixed(0);
+    final buf = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      final idxFromEnd = s.length - i;
+      buf.write(s[i]);
+      final isLast = i == s.length - 1;
+      if (!isLast && idxFromEnd % 3 == 1) {
+        buf.write(' ');
+      }
+    }
+    return buf.toString();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1281,143 +1326,27 @@ class _EditProductDialogState extends State<_EditProductDialog> {
   @override
   Widget build(BuildContext context) {
     final p = widget.item.product;
-    final scheme = Theme.of(context).colorScheme;
-
     return Center(
-      child: Container(
-        width: MediaQuery.of(context).size.width - 240,
-        margin: const EdgeInsets.symmetric(vertical: 200),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-        ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720, maxHeight: 640),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Material(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             elevation: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                    // Изображение
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: p.imageUrlModal == null || p.imageUrlModal!.isEmpty
-                          ? const ColoredBox(color: Color(0xFFEFF1F5))
-                          : Image.network(
-                              p.imageUrlModal!,
-                              fit: BoxFit.contain,
-                              loadingBuilder: (c, w, ev) =>
-                                  ev == null ? w : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                              errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
-                            ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Название
-                    Text(
-                      p.name,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Опции (размеры)
-                    if (p.options.isNotEmpty) ...[
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Выберите вариант:", style: TextStyle(fontWeight: FontWeight.w600)),
-                      ),
-                      Column(
-                        children: p.options.map((o) {
-                          return RadioListTile<int>(
-                            title: tengeText("${o.option.label}: ${o.price.toStringAsFixed(0)}", const TextStyle()),
-                            value: o.id,
-                            groupValue: _selectedOptionId,
-                            onChanged: (v) {
-                              setState(() => _selectedOptionId = v);
-                            },
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-
-                  // Допы
-                  if (p.addons.isNotEmpty) ...[
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Добавки:", style: TextStyle(fontWeight: FontWeight.w600)),
-                    ),
-                    Expanded(
-                      child: ListView(
-                        children: p.addons.map((a) {
-                          final checked = _selectedAddons.contains(a.id);
-                          return CheckboxListTile(
-                            value: checked,
-                            onChanged: (v) {
-                              setState(() {
-                                if (v == true) {
-                                  _selectedAddons.add(a.id);
-                                } else {
-                                  _selectedAddons.remove(a.id);
-                                }
-                              });
-                            },
-                            title: tengeText("${a.name} +${a.price.toStringAsFixed(0)}", const TextStyle()),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ] else
-                    const Spacer(),
-
-                  const SizedBox(height: 8),
-
-                    // Кол-во + кнопки
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: _qty > 1 ? () => setState(() => _qty--) : null,
-                          icon: const Icon(Icons.remove_circle_outline),
-                        ),
-                        Text('$_qty', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                        IconButton(
-                          onPressed: () => setState(() => _qty++),
-                          icon: const Icon(Icons.add_circle_outline),
-                        ),
-                        const Spacer(),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (_selectedOptionId == null && p.options.isNotEmpty) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(content: Text("Выберите вариант")));
-                              return;
-                            }
-
-                            final cart = context.read<CartState>();
-                            // Удаляем старую позицию
-                            cart.remove(widget.item);
-                            // Добавляем обновленную позицию
-                            cart.add(
-                              p,
-                              optionId: _selectedOptionId,
-                              addonIds: _selectedAddons.toList(),
-                              qty: _qty,
-                            );
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Обновить"),
-                        ),
-                        const SizedBox(width: 8),
-                        OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text("Отмена"),
-                        ),
-                      ],
-                    )
-                ],
-              ),
+            child: ProductModalEmbedded(
+              product: p,
+              onClose: () => Navigator.of(context).pop(),
+              initialOptionId: _selectedOptionId,
+              initialAddons: _selectedAddons,
+              initialQty: _qty,
+              onConfirm: (optionId, addonIds, qty) {
+                final cart = context.read<CartState>();
+                // Обновление позиции
+                cart.remove(widget.item);
+                cart.add(p, optionId: optionId, addonIds: addonIds, qty: qty);
+                Navigator.of(context).pop();
+              },
             ),
           ),
         ),

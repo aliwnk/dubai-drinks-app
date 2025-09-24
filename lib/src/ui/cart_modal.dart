@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 
 import '../state/cart_state.dart';
@@ -6,6 +7,7 @@ import '../state/cart_item.dart';
 import 'tenge_utils.dart';
 import '../repo/catalog_repo.dart';
 import '../repo/order_payload.dart';
+import 'product_modal.dart';
 
 Future<void> showCartModal(BuildContext context) {
   return showModalBottomSheet(
@@ -108,6 +110,10 @@ class _CartSheet extends StatelessWidget {
                       }
                     }
                   },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF057A4C),
+                    foregroundColor: Colors.white,
+                  ),
                   child: const Text('Оформить'),
                 ),
               ],
@@ -134,10 +140,17 @@ class _CartSheet extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFFEF3340),
+              ),
               child: const Text('Отмена'),
             ),
             FilledButton(
               onPressed: () => Navigator.of(ctx).pop(controller.text),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF057A4C),
+                foregroundColor: Colors.white,
+              ),
               child: const Text('Продолжить'),
             ),
           ],
@@ -175,9 +188,18 @@ class _CartSheet extends StatelessWidget {
       pageBuilder: (_, __, ___) => _EditProductDialog(item: item),
       transitionBuilder: (ctx, anim, _, child) {
         final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
-        return Transform.scale(
-          scale: 0.95 + 0.05 * curved.value,
-          child: Opacity(opacity: anim.value, child: child),
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+              child: const SizedBox.shrink(),
+            ),
+            Transform.scale(
+              scale: 0.95 + 0.05 * curved.value,
+              child: Opacity(opacity: anim.value, child: child),
+            ),
+          ],
         );
       },
     );
@@ -289,6 +311,20 @@ class _EditProductDialogState extends State<_EditProductDialog> {
   final Set<int> _selectedAddons = {};
   int _qty = 1;
 
+  String _formatPrice(num value) {
+    final s = value.toStringAsFixed(0);
+    final buf = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      final idxFromEnd = s.length - i;
+      buf.write(s[i]);
+      final isLast = i == s.length - 1;
+      if (!isLast && idxFromEnd % 3 == 1) {
+        buf.write(' ');
+      }
+    }
+    return buf.toString();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -300,138 +336,26 @@ class _EditProductDialogState extends State<_EditProductDialog> {
   @override
   Widget build(BuildContext context) {
     final p = widget.item.product;
-    final scheme = Theme.of(context).colorScheme;
-
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720, maxHeight: 640),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Material(
-            color: scheme.surface,
+            color: Theme.of(context).colorScheme.surface,
             elevation: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Изображение
-                  AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: p.imageUrlModal == null || p.imageUrlModal!.isEmpty
-                        ? const ColoredBox(color: Color(0xFFEFF1F5))
-                        : Image.network(
-                            p.imageUrlModal!,
-                            fit: BoxFit.contain,
-                            loadingBuilder: (c, w, ev) =>
-                                ev == null ? w : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                            errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
-                          ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Название
-                  Text(
-                    p.name,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Опции (размеры)
-                  if (p.options.isNotEmpty) ...[
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Выберите вариант:", style: TextStyle(fontWeight: FontWeight.w600)),
-                    ),
-                    Column(
-                      children: p.options.map((o) {
-                        return RadioListTile<int>(
-                          title: tengeText("${o.option.label}: ${o.price.toStringAsFixed(0)}", const TextStyle()),
-                          value: o.id,
-                          groupValue: _selectedOptionId,
-                          onChanged: (v) {
-                            setState(() => _selectedOptionId = v);
-                          },
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-
-                  // Допы
-                  if (p.addons.isNotEmpty) ...[
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Добавки:", style: TextStyle(fontWeight: FontWeight.w600)),
-                    ),
-                    Expanded(
-                      child: ListView(
-                        children: p.addons.map((a) {
-                          final checked = _selectedAddons.contains(a.id);
-                          return CheckboxListTile(
-                            value: checked,
-                            onChanged: (v) {
-                              setState(() {
-                                if (v == true) {
-                                  _selectedAddons.add(a.id);
-                                } else {
-                                  _selectedAddons.remove(a.id);
-                                }
-                              });
-                            },
-                            title: tengeText("${a.name} +${a.price.toStringAsFixed(0)}", const TextStyle()),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ] else
-                    const Spacer(),
-
-                  const SizedBox(height: 8),
-
-                  // Кол-во + кнопки
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: _qty > 1 ? () => setState(() => _qty--) : null,
-                        icon: const Icon(Icons.remove_circle_outline),
-                      ),
-                      Text('$_qty', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                      IconButton(
-                        onPressed: () => setState(() => _qty++),
-                        icon: const Icon(Icons.add_circle_outline),
-                      ),
-                      const Spacer(),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_selectedOptionId == null && p.options.isNotEmpty) {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(content: Text("Выберите вариант")));
-                            return;
-                          }
-
-                          final cart = context.read<CartState>();
-                          // Удаляем старую позицию
-                          cart.remove(widget.item);
-                          // Добавляем обновленную позицию
-                          cart.add(
-                            p,
-                            optionId: _selectedOptionId,
-                            addonIds: _selectedAddons.toList(),
-                            qty: _qty,
-                          );
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Обновить"),
-                      ),
-                      const SizedBox(width: 8),
-                      OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text("Отмена"),
-                      ),
-                    ],
-                  )
-                ],
-              ),
+            child: ProductModalEmbedded(
+              product: p,
+              onClose: () => Navigator.of(context).pop(),
+              initialOptionId: _selectedOptionId,
+              initialAddons: _selectedAddons,
+              initialQty: _qty,
+              onConfirm: (optionId, addonIds, qty) {
+                final cart = context.read<CartState>();
+                // Удалить старую позицию и добавить обновлённую
+                cart.remove(widget.item);
+                cart.add(p, optionId: optionId, addonIds: addonIds, qty: qty);
+              },
             ),
           ),
         ),
