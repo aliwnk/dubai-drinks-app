@@ -337,25 +337,31 @@ class _EditProductDialogState extends State<_EditProductDialog> {
   Widget build(BuildContext context) {
     final p = widget.item.product;
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 720, maxHeight: 640),
+      child: Container(
+        width: MediaQuery.of(context).size.width - 240,
+        margin: const EdgeInsets.symmetric(vertical: 200),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: const [],
+        ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(32),
           child: Material(
-            color: Theme.of(context).colorScheme.surface,
+            color: Colors.white,
             elevation: 0,
             child: ProductModalEmbedded(
-              product: p,
-              onClose: () => Navigator.of(context).pop(),
-              initialOptionId: _selectedOptionId,
-              initialAddons: _selectedAddons,
-              initialQty: _qty,
-              onConfirm: (optionId, addonIds, qty) {
-                final cart = context.read<CartState>();
-                // Удалить старую позицию и добавить обновлённую
-                cart.remove(widget.item);
-                cart.add(p, optionId: optionId, addonIds: addonIds, qty: qty);
-              },
+            product: p,
+            onClose: () => Navigator.of(context).pop(),
+            initialOptionId: _selectedOptionId,
+            initialAddons: _selectedAddons,
+            initialQty: _qty,
+            confirmLabel: "Обновить",
+            onConfirm: (optionId, addonIds, qty) {
+              final cart = context.read<CartState>();
+              cart.remove(widget.item);
+              cart.add(p, optionId: optionId, addonIds: addonIds, qty: qty);
+            },
             ),
           ),
         ),

@@ -17,7 +17,9 @@ class Addon {
       id: json['id'] as int,
       name: json['name'] as String,
       price: double.parse(json['price'].toString()),
-      addonImageUrl: json['addon_image_url'] as String?,
+      addonImageUrl: (json['addon_image_url'] as String?)
+          ?? (json['image_url'] as String?)
+          ?? (json['image'] as String?),
     );
   }
 

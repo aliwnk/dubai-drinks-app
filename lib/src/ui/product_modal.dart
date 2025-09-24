@@ -114,81 +114,89 @@ class _ProductDialogState extends State<_ProductDialog> {
                     const SizedBox(height: 12),
                   ],
 
-                  // Допы
+                  // Дополнения
                   if (p.addons.isNotEmpty) ...[
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text("Добавки:", style: TextStyle(fontWeight: FontWeight.w600)),
+                      child: Text("Дополнения:", style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
                     SizedBox(
-                      height: 160,
+                      height: 220,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: p.addons.map((a) {
                             final checked = _selectedAddons.contains(a.id);
-                            return Container(
-                              width: 100,
-                              margin: const EdgeInsets.only(right: 8),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: (a.addonImageUrl != null && a.addonImageUrl!.isNotEmpty)
-                                        ? Image.network(
-                                            a.addonImageUrl!,
-                                            width: 60,
-                                            height: 60,
-                                            fit: BoxFit.cover,
-                                            loadingBuilder: (c, w, ev) => ev == null
-                                                ? w
-                                                : const SizedBox(
-                                                    width: 60,
-                                                    height: 60,
-                                                    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                                                  ),
-                                            errorBuilder: (_, __, ___) => const SizedBox(
-                                              width: 60,
-                                              height: 60,
-                                              child: Center(child: Icon(Icons.broken_image)),
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (checked) {
+                                    _selectedAddons.remove(a.id);
+                                  } else {
+                                    _selectedAddons.add(a.id);
+                                  }
+                                });
+                              },
+                              child: Container(
+                                width: 120,
+                                margin: const EdgeInsets.only(right: 8),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: checked ? const Color(0xFF057A4C) : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: (a.addonImageUrl != null && a.addonImageUrl!.isNotEmpty)
+                                          ? Image.network(
+                                              a.addonImageUrl!,
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                              loadingBuilder: (c, w, ev) => ev == null
+                                                  ? w
+                                                  : const SizedBox(
+                                                      width: 100,
+                                                      height: 100,
+                                                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                                    ),
+                                              errorBuilder: (_, __, ___) => const SizedBox(
+                                                width: 100,
+                                                height: 100,
+                                                child: Center(child: Icon(Icons.broken_image)),
+                                              ),
+                                            )
+                                          : Container(
+                                              width: 100,
+                                              height: 100,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFEFF1F5),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
                                             ),
-                                          )
-                                        : Container(
-                                            width: 60,
-                                            height: 60,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFEFF1F5),
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    a.name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  tengeText(
-                                    a.price.toStringAsFixed(0),
-                                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                                  ),
-                                  Checkbox(
-                                    value: checked,
-                                    onChanged: (v) {
-                                      setState(() {
-                                        if (v == true) {
-                                          _selectedAddons.add(a.id);
-                                        } else {
-                                          _selectedAddons.remove(a.id);
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      a.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    tengeText(
+                                      a.price.toStringAsFixed(0),
+                                      const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+                                    ),
+                                    // чекбокс удалён — активность показывается зелёной рамкой
+                                  ],
+                                ),
                               ),
                             );
                           }).toList(),
@@ -266,6 +274,8 @@ class ProductModalEmbedded extends StatefulWidget {
   final int initialQty;
   // Кастомное подтверждение (например, обновление позиции в корзине)
   final void Function(int? optionId, List<int> addonIds, int qty)? onConfirm;
+  // Подпись на кнопке подтверждения
+  final String confirmLabel;
 
   const ProductModalEmbedded({
     required this.product,
@@ -274,6 +284,7 @@ class ProductModalEmbedded extends StatefulWidget {
     this.initialAddons,
     this.initialQty = 1,
     this.onConfirm,
+    this.confirmLabel = "Заказать",
     super.key,
   });
 
@@ -366,14 +377,15 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
             const SizedBox(height: 12),
           ],
 
-          // Допы
+          // Дополнения
           if (p.addons.isNotEmpty) ...[
-            const Text("Добавки:", style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text("Дополнения:", style: TextStyle(fontWeight: FontWeight.w600)),
             SizedBox(
-              height: 160,
+              height: 220,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: p.addons.map((a) {
                     final checked = _selectedAddons.contains(a.id);
                     return GestureDetector(
@@ -387,8 +399,15 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                         });
                       },
                       child: Container(
-                        width: 100,
+                        width: 120,
                         margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: checked ? const Color(0xFF057A4C) : Colors.transparent,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -397,25 +416,25 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                             child: (a.addonImageUrl != null && a.addonImageUrl!.isNotEmpty)
                                 ? Image.network(
                                     a.addonImageUrl!,
-                                    width: 60,
-                                    height: 60,
+                                    width: 100,
+                                    height: 100,
                                     fit: BoxFit.cover,
                                     loadingBuilder: (c, w, ev) => ev == null
                                         ? w
                                         : const SizedBox(
-                                            width: 60,
-                                            height: 60,
+                                            width: 100,
+                                            height: 100,
                                             child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
                                           ),
                                     errorBuilder: (_, __, ___) => const SizedBox(
-                                      width: 60,
-                                      height: 60,
+                                      width: 100,
+                                      height: 100,
                                       child: Center(child: Icon(Icons.broken_image)),
                                     ),
                                   )
                                 : Container(
-                                    width: 60,
-                                    height: 60,
+                                    width: 100,
+                                    height: 100,
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFEFF1F5),
                                       borderRadius: BorderRadius.circular(8),
@@ -428,25 +447,14 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 4),
                           tengeText(
                             a.price.toStringAsFixed(0),
-                            const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                            const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
                           ),
-                          Checkbox(
-                            value: checked,
-                            onChanged: (v) {
-                              setState(() {
-                                if (v == true) {
-                                  _selectedAddons.add(a.id);
-                                } else {
-                                  _selectedAddons.remove(a.id);
-                                }
-                              });
-                            },
-                          ),
+                          // checkbox removed; selection visualized by border
                         ],
                         ),
                       ),
@@ -497,7 +505,7 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                       );
                   widget.onClose();
                 },
-                child: const Text("Заказать"),
+                child: Text(widget.confirmLabel),
               ),
               const SizedBox(width: 8),
               OutlinedButton(
