@@ -221,10 +221,59 @@ class _ProductDialogState extends State<_ProductDialog> {
                         icon: const Icon(Icons.add_circle_outline),
                       ),
                       const Spacer(),
+                      // Пилюля слева от кнопки
+                      Builder(
+                        builder: (_) {
+                          double optionPrice = 0;
+                          if (_selectedOptionId != null) {
+                            final opt = p.options.firstWhere(
+                              (o) => o.id == _selectedOptionId,
+                              orElse: () => p.options.isNotEmpty ? p.options.first : (throw StateError('no options')),
+                            );
+                            optionPrice = opt.price;
+                          }
+                          double addonsPrice = 0;
+                          for (final a in p.addons) {
+                            if (_selectedAddons.contains(a.id)) addonsPrice += a.price;
+                          }
+                          final total = (optionPrice + addonsPrice) * _qty;
+                          return Container(
+                            margin: const EdgeInsets.only(right: 0),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 10),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFF5F5F5),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(24),
+                                    bottomLeft: Radius.circular(24),
+                                    topRight: Radius.circular(0),
+                                    bottomRight: Radius.circular(0),
+                                  ),
+                                ),
+                                child: tengeText(
+                                  total.toStringAsFixed(0),
+                                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.black87),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF057A4C),
                           foregroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(0),
+                              bottomLeft: Radius.circular(0),
+                              topRight: Radius.circular(24),
+                              bottomRight: Radius.circular(24),
+                            ),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         ),
                         onPressed: () {
                           if (_selectedOptionId == null && p.options.isNotEmpty) {
@@ -479,10 +528,59 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                 icon: const Icon(Icons.add_circle_outline),
               ),
               const Spacer(),
+              // Пилюля слева от кнопки
+              Builder(
+                builder: (_) {
+                  double optionPrice = 0;
+                  if (_selectedOptionId != null) {
+                    final opt = p.options.firstWhere(
+                      (o) => o.id == _selectedOptionId,
+                      orElse: () => p.options.isNotEmpty ? p.options.first : (throw StateError('no options')),
+                    );
+                    optionPrice = opt.price;
+                  }
+                  double addonsPrice = 0;
+                  for (final a in p.addons) {
+                    if (_selectedAddons.contains(a.id)) addonsPrice += a.price;
+                  }
+                  final total = (optionPrice + addonsPrice) * _qty;
+                  return Container(
+                    margin: const EdgeInsets.only(right: 0),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 10),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            bottomLeft: Radius.circular(24),
+                            topRight: Radius.circular(0),
+                            bottomRight: Radius.circular(0),
+                          ),
+                        ),
+                        child: tengeText(
+                          total.toStringAsFixed(0),
+                          const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.black87),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF057A4C),
                   foregroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(0),
+                      bottomLeft: Radius.circular(0),
+                      topRight: Radius.circular(24),
+                      bottomRight: Radius.circular(24),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
                 onPressed: () {
                   if (_selectedOptionId == null && p.options.isNotEmpty) {
