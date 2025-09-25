@@ -61,24 +61,48 @@ class _ProductDialogState extends State<_ProductDialog> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Изображение (full-bleed: прижато к краям)
+                  // Изображение (full-bleed: прижато к краям) + белый градиент 50px снизу
                   Transform.translate(
                     offset: const Offset(-20, -20),
                     child: OverflowBox(
                       alignment: Alignment.topCenter,
                       minWidth: 0,
                       maxWidth: double.infinity,
-                      child: AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: p.imageUrlModal == null || p.imageUrlModal!.isEmpty
-                            ? const ColoredBox(color: Color(0xFFEFF1F5))
-                            : Image.network(
-                                p.imageUrlModal!,
-                                fit: BoxFit.cover,
-                                loadingBuilder: (c, w, ev) =>
-                                    ev == null ? w : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                                errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
+                      child: Stack(
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: p.imageUrlModal == null || p.imageUrlModal!.isEmpty
+                                ? const ColoredBox(color: Color(0xFFEFF1F5))
+                                : Image.network(
+                                    p.imageUrlModal!,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (c, w, ev) =>
+                                        ev == null ? w : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                    errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
+                                  ),
+                          ),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: IgnorePointer(
+                              child: Container(
+                                height: 100,
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0x00FFFFFF),
+                                      Color(0xFFFFFFFF),
+                                    ],
+                                  ),
+                                ),
                               ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -381,7 +405,7 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Картинка (full-bleed: прижато к краям)
+          // Картинка (full-bleed: прижато к краям) + белый градиент 50px снизу
           Expanded(
             child: Transform.translate(
               offset: const Offset(-30, -30),
@@ -391,15 +415,39 @@ class _ProductModalEmbeddedState extends State<ProductModalEmbedded> {
                 maxWidth: double.infinity,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: p.imageUrlModal == null || p.imageUrlModal!.isEmpty
-                      ? const ColoredBox(color: Color(0xFFEFF1F5))
-                      : Image.network(
-                          p.imageUrlModal!,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (c, w, ev) =>
-                              ev == null ? w : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                          errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
+                  child: Stack(
+                    children: [
+                      p.imageUrlModal == null || p.imageUrlModal!.isEmpty
+                          ? const ColoredBox(color: Color(0xFFEFF1F5))
+                          : Image.network(
+                              p.imageUrlModal!,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (c, w, ev) =>
+                                  ev == null ? w : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
+                            ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: IgnorePointer(
+                          child: Container(
+                            height: 100,
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0x00FFFFFF),
+                                  Color(0xFFFFFFFF),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
