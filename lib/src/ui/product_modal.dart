@@ -51,7 +51,7 @@ class _ProductDialogState extends State<_ProductDialog> {
 
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 720, maxHeight: 640),
+        constraints: const BoxConstraints(maxWidth: 720, maxHeight: 840),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Material(

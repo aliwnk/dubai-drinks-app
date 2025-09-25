@@ -665,7 +665,7 @@ class _ModalPage extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   width: MediaQuery.of(context).size.width - 240,
-                  margin: const EdgeInsets.symmetric(vertical: 200),
+                  margin: const EdgeInsets.symmetric(vertical: 100),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(32),
@@ -1329,7 +1329,7 @@ class _EditProductDialogState extends State<_EditProductDialog> {
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width - 240,
-        margin: const EdgeInsets.symmetric(vertical: 200),
+        margin: const EdgeInsets.symmetric(vertical: 100),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(32),

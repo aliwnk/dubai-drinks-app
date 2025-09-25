@@ -339,7 +339,7 @@ class _EditProductDialogState extends State<_EditProductDialog> {
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width - 240,
-        margin: const EdgeInsets.symmetric(vertical: 200),
+        margin: const EdgeInsets.symmetric(vertical: 100),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(32),
@@ -351,17 +351,17 @@ class _EditProductDialogState extends State<_EditProductDialog> {
             color: Colors.white,
             elevation: 0,
             child: ProductModalEmbedded(
-            product: p,
-            onClose: () => Navigator.of(context).pop(),
-            initialOptionId: _selectedOptionId,
-            initialAddons: _selectedAddons,
-            initialQty: _qty,
-            confirmLabel: "Обновить",
-            onConfirm: (optionId, addonIds, qty) {
-              final cart = context.read<CartState>();
-              cart.remove(widget.item);
-              cart.add(p, optionId: optionId, addonIds: addonIds, qty: qty);
-            },
+              product: p,
+              onClose: () => Navigator.of(context).pop(),
+              initialOptionId: _selectedOptionId,
+              initialAddons: _selectedAddons,
+              initialQty: _qty,
+              confirmLabel: "Обновить",
+              onConfirm: (optionId, addonIds, qty) {
+                final cart = context.read<CartState>();
+                cart.remove(widget.item);
+                cart.add(p, optionId: optionId, addonIds: addonIds, qty: qty);
+              },
             ),
           ),
         ),
